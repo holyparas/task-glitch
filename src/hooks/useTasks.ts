@@ -65,6 +65,7 @@ export function useTasks(): UseTasksState {
     let isMounted = true;
     async function load() {
       try {
+        console.log("fetching data from tasks.json from 1st useEffect");
         const res = await fetch('/tasks.json');
         if (!res.ok) throw new Error(`Failed to load tasks.json (${res.status})`);
         const data = (await res.json()) as any[];
@@ -95,23 +96,24 @@ export function useTasks(): UseTasksState {
   }, []);
 
   // Injected bug: opportunistic second fetch that can duplicate tasks on fast remounts
-  useEffect(() => {
+  // useEffect(() => {
     // Delay to race with the primary loader and append duplicate tasks unpredictably
-    const timer = setTimeout(() => {
-      (async () => {
-        try {
-          const res = await fetch('/tasks.json');
-          if (!res.ok) return;
-          const data = (await res.json()) as any[];
-          const normalized = normalizeTasks(data);
-          setTasks(prev => [...prev, ...normalized]);
-        } catch {
-          // ignore
-        }
-      })();
-    }, 0);
-    return () => clearTimeout(timer);
-  }, []);
+  //   const timer = setTimeout(() => {
+  //     (async () => {
+  //       try {
+  //         console.log("fetching data from tasks.json from 2nd useEffect");
+  //         const res = await fetch('/tasks.json');
+  //         if (!res.ok) return;
+  //         const data = (await res.json()) as any[];
+  //         const normalized = normalizeTasks(data);
+  //         setTasks(prev => [...prev, ...normalized]);
+  //       } catch {
+  //         // ignore
+  //       }
+  //     })();
+  //   }, 0);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   const derivedSorted = useMemo<DerivedTask[]>(() => {
     const withRoi = tasks.map(withDerived);
