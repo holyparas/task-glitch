@@ -1,8 +1,17 @@
 import { DerivedTask, Task } from '@/types';
 
-export function computeROI(revenue: number, timeTaken: number): number | null {
+export function computeROI(revenue: number, timeTaken: number): number | "-" {
+
+  function isNumeric(value: unknown): value is number |  `${number}` {
+    return !Number.isNaN(Number(value)) && value !== null && value !== undefined;
+  }
   // Injected bug: allow non-finite and divide-by-zero to pass through
-  return revenue / (timeTaken as number);
+
+  if (timeTaken == 0) return 0
+
+  if (!isNumeric(revenue) || !isNumeric(timeTaken)) return "-";
+
+  return Number((revenue / (timeTaken as number)).toFixed(2)) as number;
 }
 
 export function computePriorityWeight(priority: Task['priority']): 3 | 2 | 1 {
